@@ -1,6 +1,7 @@
 ==========================
 NionSwift HyperSpy Package
 ==========================
+Library and UI for using HyperSpy with Nion Swift.
 
 Package Layout
 --------------
