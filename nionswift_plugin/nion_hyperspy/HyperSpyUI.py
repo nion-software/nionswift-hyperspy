@@ -34,7 +34,32 @@ target.xdata = nion.hyperspy.signal_to_xdata(signal)[signal_px[0]:signal_px[1]]
                             'type': 'interval'},
                        ]}],
           'title': 'Background Removed (HS)',
-        }
+        },
+    "nion.hyperspy.map":
+        { 'script': '''# map background subtracted signal with HyperSpy
+
+import hyperspy.api as hyperspy
+import nion.hyperspy
+
+fit_px = int(fit_region.interval[0] * src_fit.display_xdata.data_shape[0]), int(fit_region.interval[1] * src_fit.display_xdata.data_shape[0])
+signal_px = int(signal_region.interval[0] * src_fit.display_xdata.data_shape[0]), int(signal_region.interval[1] * src_fit.display_xdata.data_shape[0])
+signal = nion.hyperspy.xdata_to_signal(src.xdata)
+signal = signal.remove_background(signal_range=fit_px).isig[signal_px[0]:signal_px[1]].integrate1D(2)
+target.xdata = nion.hyperspy.signal_to_xdata(signal)
+''',
+          'sources': [{'label': 'Fitting Source', 'name': 'src_fit',
+                       'requirements': [{"type": "dimensionality", "min": 1, "max": 1}],
+                       'regions': [
+                           {'name': 'fit_region', 'params': {'label': 'Fit', 'interval': (0.2, 0.3)},
+                            'type': 'interval'},
+                           {'name': 'signal_region', 'params': {'label': 'Signal', 'interval': (0.4, 0.5)},
+                            'type': 'interval'},
+                       ]},
+                      {'label': 'Source', 'name': 'src',
+                       'requirements': [{"type": "dimensionality", "min": 3, "max": 3}]
+                       }],
+          'title': 'Mapped (HS)',
+          },
 }
 
 #
@@ -74,12 +99,10 @@ class RemoveBackgroundMenuItem(HyperSpyMenuItemBase):
         #
         _document_window = window._document_window
         display_specifier = _document_window.selected_display_specifier
-        data_item = _document_window.document_model.make_data_item_with_computation("nion.hyperspy.background", [(display_specifier.data_item, None)], {"src": [None, None]})
-        if data_item:
-            new_display_specifier = DataItem.DisplaySpecifier.from_data_item(data_item)
+        _data_item = _document_window.document_model.make_data_item_with_computation("nion.hyperspy.background", [(display_specifier.data_item, None)], {"src": [None, None]})
+        if _data_item:
+            new_display_specifier = DataItem.DisplaySpecifier.from_data_item(_data_item)
             _document_window.display_data_item(new_display_specifier)
-            return data_item
-        return None
 
 
 class AlignZLPMenuItem(HyperSpyMenuItemBase):
@@ -99,6 +122,32 @@ class AlignZLPMenuItem(HyperSpyMenuItemBase):
                 window.display_data_item(data_item)
 
 
+class MapSignalMenuItem(HyperSpyMenuItemBase):
+
+    menu_item_name = _("Map Signal")  # menu item name
+
+    def menu_item_execute(self, window: API.DocumentWindow) -> None:
+        #
+        # WARNING: NION SWIFT VERSION DEPENDENT CODE. DO NOT USE AS AN EXAMPLE.
+        #
+        # The code below is Nion Swift version dependent.  If you are using this as a
+        # coding example, use with extreme caution. This code is maintained by the
+        # Nion Swift development team and new versions of Nion Swift will almost
+        # assuredly be incompatible with this code. The Nion Swift team will update
+        # this code to work with new versions; however we will not update _your code_
+        # based on this code. Please use the standard Nion Swift API instead.
+        #
+        data_item = window.target_data_item
+        if data_item and data_item.xdata.is_data_1d and len(data_item.display.graphics) == 3:
+            src_data_items = window.library.get_source_data_items(data_item)
+            if len(src_data_items) == 1 and src_data_items[0].xdata.is_data_3d:
+                src_data_item = src_data_items[0]
+                _document_window = window._document_window
+                _data_item = _document_window.document_model.make_data_item_with_computation("nion.hyperspy.map", [(data_item._data_item, None), (src_data_item._data_item, None)], {"src_fit": [data_item.display.graphics[1]._graphic, data_item.display.graphics[2]._graphic]})
+                if _data_item:
+                    new_display_specifier = DataItem.DisplaySpecifier.from_data_item(_data_item)
+                    _document_window.display_data_item(new_display_specifier)
+
 
 class HyperSpyExtension:
 
@@ -111,7 +160,9 @@ class HyperSpyExtension:
         # be sure to keep a reference or it will be closed immediately.
         self.__menu_item_ref = api.create_menu_item(RemoveBackgroundMenuItem())
         self.__align_zlp_menu_item_ref = api.create_menu_item(AlignZLPMenuItem())
+        self.__map_signal_menu_item_ref = api.create_menu_item(MapSignalMenuItem())
 
     def close(self):
         self.__menu_item_ref.close()
         self.__align_zlp_menu_item_ref.close()
+        self.__map_signal_menu_item_ref.close()
