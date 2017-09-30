@@ -22,4 +22,5 @@ def signal_to_xdata(signal: hyperspy.signals.BaseSignal) -> DataAndMetadata.Data
     dimensional_calibrations = list()
     for axis in signal.axes_manager.navigation_axes + signal.axes_manager.signal_axes:
         dimensional_calibrations.append(Calibration.Calibration(axis.offset, axis.scale, axis.units))
-    return DataAndMetadata.new_data_and_metadata(signal.data, dimensional_calibrations=dimensional_calibrations)
+    data_descriptor = DataAndMetadata.DataDescriptor(False, len(signal.axes_manager.navigation_axes), len(signal.axes_manager.signal_axes))
+    return DataAndMetadata.new_data_and_metadata(signal.data, dimensional_calibrations=dimensional_calibrations, data_descriptor=data_descriptor)
