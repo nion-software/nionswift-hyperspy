@@ -25,6 +25,9 @@ setuptools.setup(
         "Programming Language :: Python :: 3.5",
     ],
     include_package_data=True,
+    # This prevents package from being installed in zipped form. Otherwise it will not be recognized by Swift.
+    # For more info see: https://setuptools.readthedocs.io/en/latest/setuptools.html#setting-the-zip-safe-flag
+    zip_safe=False,
     test_suite="nion.hyperspy.test",
     python_requires='~=3.5',
 )
