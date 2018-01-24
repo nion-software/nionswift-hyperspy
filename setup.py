@@ -17,7 +17,7 @@ setuptools.setup(
     long_description=open("README.rst").read(),
     url="https://github.com/nion-software/nionswift-hyperspy",
     packages=["nion.hyperspy", "nionswift_plugin.nion_hyperspy"],
-    install_requires=['hyperspy', 'nionswift'],
+    install_requires=['hyperspy'],
     license='GPLv3',
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
