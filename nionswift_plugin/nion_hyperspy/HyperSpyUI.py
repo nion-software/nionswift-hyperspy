@@ -23,12 +23,13 @@ import nion.hyperspy
 import numpy as np
 
 signal = nion.hyperspy.xdata_to_signal(src.display_xdata)
-fit_px = int(fit_region.interval[0] * src.display_xdata.data_shape[0]), int(fit_region.interval[1] * src.display_xdata.data_shape[0])
+calibration = src.display_xdata.dimensional_calibrations[0]
+fit_px = calibration.convert_to_calibrated_value(int(fit_region.interval[0] * src.display_xdata.data_shape[0])), calibration.convert_to_calibrated_value(int(fit_region.interval[1] * src.display_xdata.data_shape[0]))
 signal_px = int(signal_region.interval[0] * src.display_xdata.data_shape[0]), int(signal_region.interval[1] * src.display_xdata.data_shape[0])
 model = Model1D(signal)
 background_estimator = components1d.PowerLaw()
 model.append(background_estimator)
-background_estimator.estimate_parameters(signal, fit_px[0], fit_px[1], only_current=False)
+background_estimator.estimate_parameters(signal, fit_px[0], fit_px[1])
 oldax = signal.axes_manager.as_dictionary()
 newax = oldax['axis-0'].copy()
 newax['navigate'] = True
