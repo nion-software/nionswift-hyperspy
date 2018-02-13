@@ -21,9 +21,9 @@ import nion.hyperspy
 
 signal = nion.hyperspy.xdata_to_signal(src.display_xdata)
 calibration = src.display_xdata.dimensional_calibrations[0]
-fit_px = calibration.convert_to_calibrated_value(int(fit_region.interval[0] * src.display_xdata.data_shape[0])), calibration.convert_to_calibrated_value(int(fit_region.interval[1] * src.display_xdata.data_shape[0]))
+fit_range = calibration.convert_to_calibrated_value(int(fit_region.interval[0] * src.display_xdata.data_shape[0])), calibration.convert_to_calibrated_value(int(fit_region.interval[1] * src.display_xdata.data_shape[0]))
 signal_px = int(signal_region.interval[0] * src.display_xdata.data_shape[0]), int(signal_region.interval[1] * src.display_xdata.data_shape[0])
-signal = signal.remove_background(signal_range=fit_px)
+signal = signal.remove_background(signal_range=fit_range)
 target.xdata = nion.hyperspy.signal_to_xdata(signal)[signal_px[0]:signal_px[1]]
 ''',
           'sources': [{'label': 'Source', 'name': 'src',
@@ -42,10 +42,11 @@ target.xdata = nion.hyperspy.signal_to_xdata(signal)[signal_px[0]:signal_px[1]]
 import hyperspy.api as hyperspy
 import nion.hyperspy
 
-fit_px = int(fit_region.interval[0] * src_fit.display_xdata.data_shape[0]), int(fit_region.interval[1] * src_fit.display_xdata.data_shape[0])
+calibration = src.display_xdata.dimensional_calibrations[0]
+fit_range = calibration.convert_to_calibrated_value(int(fit_region.interval[0] * src.display_xdata.data_shape[0])), calibration.convert_to_calibrated_value(int(fit_region.interval[1] * src.display_xdata.data_shape[0]))
 signal_px = int(signal_region.interval[0] * src_fit.display_xdata.data_shape[0]), int(signal_region.interval[1] * src_fit.display_xdata.data_shape[0])
 signal = nion.hyperspy.xdata_to_signal(src.xdata)
-signal = signal.remove_background(signal_range=fit_px).isig[signal_px[0]:signal_px[1]].integrate1D(2)
+signal = signal.remove_background(signal_range=fit_range).isig[signal_px[0]:signal_px[1]].integrate1D(2)
 target.xdata = nion.hyperspy.signal_to_xdata(signal)
 ''',
           'sources': [{'label': 'Fitting Source', 'name': 'src_fit',
