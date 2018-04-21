@@ -10,14 +10,14 @@ import os
 
 setuptools.setup(
     name="nionswift-hyperspy",
-    version="0.0.1",
+    version="0.1.0",
     author="Nion Software",
     author_email="swift@nion.com",
     description="Library and UI for using HyperSpy with Nion Swift.",
     long_description=open("README.rst").read(),
     url="https://github.com/nion-software/nionswift-hyperspy",
     packages=["nion.hyperspy", "nionswift_plugin.nion_hyperspy"],
-    install_requires=['hyperspy', 'nionswift'],
+    install_requires=['hyperspy'],
     license='GPLv3',
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
