@@ -100,11 +100,11 @@ class RemoveBackgroundMenuItem(HyperSpyMenuItemBase):
         # based on this code. Please use the standard Nion Swift API instead.
         #
         _document_window = window._document_window
-        display_specifier = _document_window.selected_display_specifier
-        _data_item = _document_window.document_model.make_data_item_with_computation("nion.hyperspy.background", [(display_specifier.data_item, None)], {"src": [None, None]})
+        selected_data_item = _document_window.selected_data_item
+        _data_item = _document_window.document_model.make_data_item_with_computation("nion.hyperspy.background", [(selected_data_item, None)], {"src": [None, None]})
         if _data_item:
-            new_display_specifier = DataItem.DisplaySpecifier.from_data_item(_data_item)
-            _document_window.display_data_item(new_display_specifier)
+            display_item = _document_window.document_model.get_display_item_for_data_item(_data_item)
+            _document_window.show_data_item(display_item)
 
 
 class AlignZLPMenuItem(HyperSpyMenuItemBase):
@@ -147,8 +147,8 @@ class MapSignalMenuItem(HyperSpyMenuItemBase):
                 _document_window = window._document_window
                 _data_item = _document_window.document_model.make_data_item_with_computation("nion.hyperspy.map", [(data_item._data_item, None), (src_data_item._data_item, None)], {"src_fit": [data_item.display.graphics[1]._graphic, data_item.display.graphics[2]._graphic]})
                 if _data_item:
-                    new_display_specifier = DataItem.DisplaySpecifier.from_data_item(_data_item)
-                    _document_window.display_data_item(new_display_specifier)
+                    display_item = _document_window.document_model.get_display_item_for_data_item(_data_item)
+                    _document_window.show_data_item(display_item)
 
 
 class HyperSpyExtension:
