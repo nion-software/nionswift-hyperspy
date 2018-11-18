@@ -100,8 +100,8 @@ class RemoveBackgroundMenuItem(HyperSpyMenuItemBase):
         # based on this code. Please use the standard Nion Swift API instead.
         #
         _document_window = window._document_window
-        selected_data_item = _document_window.selected_data_item
-        _data_item = _document_window.document_model.make_data_item_with_computation("nion.hyperspy.background", [(selected_data_item, None)], {"src": [None, None]})
+        selected_display_item = _document_window.selected_display_item
+        _data_item = _document_window.document_model.make_data_item_with_computation("nion.hyperspy.background", [(selected_display_item, None)], {"src": [None, None]})
         if _data_item:
             display_item = _document_window.document_model.get_display_item_for_data_item(_data_item)
             _document_window.show_data_item(display_item)
@@ -140,12 +140,13 @@ class MapSignalMenuItem(HyperSpyMenuItemBase):
         # based on this code. Please use the standard Nion Swift API instead.
         #
         data_item = window.target_data_item
-        if data_item and data_item.xdata.is_data_1d and len(data_item.display.graphics) == 3:
+        display_item = window.target_display_item
+        if display_item and data_item and data_item.xdata.is_data_1d and len(data_item.display.graphics) == 3:
             src_data_items = window.library.get_source_data_items(data_item)
             if len(src_data_items) == 1 and src_data_items[0].xdata.is_data_3d:
                 src_data_item = src_data_items[0]
                 _document_window = window._document_window
-                _data_item = _document_window.document_model.make_data_item_with_computation("nion.hyperspy.map", [(data_item._data_item, None), (src_data_item._data_item, None)], {"src_fit": [data_item.display.graphics[1]._graphic, data_item.display.graphics[2]._graphic]})
+                _data_item = _document_window.document_model.make_data_item_with_computation("nion.hyperspy.map", [(display_item._display_item, None), (src_data_item._data_item, None)], {"src_fit": [data_item.display.graphics[1]._graphic, data_item.display.graphics[2]._graphic]})
                 if _data_item:
                     display_item = _document_window.document_model.get_display_item_for_data_item(_data_item)
                     _document_window.show_data_item(display_item)
